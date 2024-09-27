@@ -74,6 +74,13 @@ class BlogArticle
     #[ORM\JoinColumn(nullable: false)]
     private ?User $authorId = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 4,
+        max: 200,
+        minMessage: 'Title must be at least {{ limit }} characters long',
+        maxMessage: 'Title cannot be longer than {{ limit }} characters',
+    )]
     #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','publish:blog-article','read:blog-article','read-collection:blog-article'])]
     #[ORM\Column(length: 100)]
     private ?string $title = null;
