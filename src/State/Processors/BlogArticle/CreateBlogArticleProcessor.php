@@ -16,6 +16,7 @@ class CreateBlogArticleProcessor implements ProcessorInterface
     {
         //dd($this->security->getUser()->getId());
         $data->setAuthorId($this->security->getUser());
+        $data->setStatus('draft');
 
         return $this->processorInterface->process($data,$operation,$uriVariables,$context);
     }
