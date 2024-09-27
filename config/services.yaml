@@ -26,6 +26,10 @@ services:
     App\State\Processors\BlogArticle\CreateBlogArticleProcessor:
         bind:
             $processorInterface: '@api_platform.doctrine.orm.state.persist_processor'
+    App\State\Processors\BlogArticle\PublishBlogArticleProcessor:
+        bind:
+            $processorInterface: '@api_platform.doctrine.orm.state.persist_processor'
+
 
     gedmo.listener.softdeleteable:
         class: Gedmo\SoftDeleteable\SoftDeleteableListener

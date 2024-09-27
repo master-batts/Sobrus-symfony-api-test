@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\BlogArticleRepository;
 use App\State\Processors\BlogArticle\CreateBlogArticleProcessor;
+use App\State\Processors\BlogArticle\PublishBlogArticleProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -40,6 +41,13 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
     denormalizationContext: ['groups'=> ['update:blog-article']],
     security: "object.getAuthorId() == user"
 )]
+#[Patch(
+    processor:PublishBlogArticleProcessor::class,
+    normalizationContext: ['groups'=> ['publish:blog-article']],
+    uriTemplate: 'blog_article_publish/{id}',
+    name: 'BlogArticlePublishing',
+    security: "object.getAuthorId() == user"
+)]
 #[Delete(
     security: "object.getAuthorId() == user"
 )]
@@ -49,14 +57,14 @@ class BlogArticle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['write-normalization:blog-article'])]
+    #[Groups(['write-normalization:blog-article','publish:blog-article'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'blogArticles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $authorId = null;
 
-    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article'])]
+    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','publish:blog-article'])]
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
@@ -75,7 +83,7 @@ class BlogArticle
     #[ORM\Column]
     private array $keywords = [];
 
-    #[Groups(['write-normalization:blog-article','update:blog-article'])]
+    #[Groups(['write-normalization:blog-article','update:blog-article','publish:blog-article'])]
     #[Assert\Choice(["draft", "published", "deleted"])]
     #[ORM\Column(length: 100)]
     private ?string $status = null;
