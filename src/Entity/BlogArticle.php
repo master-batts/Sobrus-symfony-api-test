@@ -44,6 +44,7 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 #[Patch(
     processor:PublishBlogArticleProcessor::class,
     normalizationContext: ['groups'=> ['publish:blog-article']],
+    denormalizationContext: ['groups'=> ['denormalization-publish:blog-article']],
     uriTemplate: 'blog_article_publish/{id}',
     name: 'BlogArticlePublishing',
     security: "object.getAuthorId() == user"
