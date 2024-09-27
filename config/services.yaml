@@ -23,6 +23,9 @@ services:
     App\State\Processors\User\CreateUserProcessor:
         bind:
             $processorInterface: '@api_platform.doctrine.orm.state.persist_processor'
+    App\State\Processors\BlogArticle\CreateBlogArticleProcessor:
+        bind:
+            $processorInterface: '@api_platform.doctrine.orm.state.persist_processor'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -3,12 +3,24 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Repository\BlogArticleRepository;
+use App\State\Processors\BlogArticle\CreateBlogArticleProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 #[ORM\Entity(repositoryClass: BlogArticleRepository::class)]
 #[ApiResource()]
+#[HasLifecycleCallbacks]
+#[Post(
+    processor: CreateBlogArticleProcessor::class,
+    denormalizationContext: ['groups'=> ['write:blog-article']],
+    normalizationContext: ['groups'=> ['write:blog-article']],
+    name: 'BlogArticleCreating',
+    uriTemplate: 'blog_article_create',
+)]
 class BlogArticle
 {
     #[ORM\Id]
@@ -20,21 +32,26 @@ class BlogArticle
     #[ORM\JoinColumn(nullable: false)]
     private ?User $authorId = null;
 
+    #[Groups(['write:blog-article'])]
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
+    #[Groups(['write:blog-article'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $publicationDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $creationDate = null;
 
+    #[Groups(['write:blog-article'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
+    #[Groups(['write:blog-article'])]
     #[ORM\Column]
     private array $keywords = [];
 
+    #[Groups(['write:blog-article'])]
     #[Assert\Choice(["draft", "published", "deleted"])]
     #[ORM\Column(length: 100)]
     private ?string $status = null;
@@ -42,7 +59,7 @@ class BlogArticle
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverPictureRef = null;
 
     public function getId(): ?int
@@ -155,6 +172,38 @@ class BlogArticle
         $this->coverPictureRef = $coverPictureRef;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function slugify()
+    {
+        // Replace non letter or digits by -
+        $slug = preg_replace('~[^\pL\d]+~u', '-', $this->title);
+
+        // Transliterate to ASCII
+        $slug = iconv('utf-8', 'us-ascii//TRANSLIT', $slug);
+
+        // Remove unwanted characters
+        $slug = preg_replace('~[^-\w]+~', '', $slug);
+
+        // Trim
+        $slug = trim($slug, '-');
+
+        // Remove duplicate -
+        $slug = preg_replace('~-+~', '-', $slug);
+
+        // Lowercase
+        $slug = strtolower($slug);
+        if (empty($this->slug)) {
+            $this->setSlug($slug);
+        }
+    }
+    #[ORM\PrePersist]
+    public function updateDate()
+    {
+        if ($this->getCreationDate() == null) {
+            $this->setCreationDate(new \DateTimeImmutable());
+        }
     }
 
 }
