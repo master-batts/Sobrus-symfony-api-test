@@ -6,3 +6,6 @@ controllers:
 auth:
     path: /api/auth
     methods: [ 'POST' ]
+api_doc:
+    path: /documentation
+    controller: api_platform.swagger_ui.action
