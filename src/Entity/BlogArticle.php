@@ -97,7 +97,7 @@ class BlogArticle
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','read:blog-article','read-collection:blog-article'])]
+    #[Groups(['write-normalization:blog-article','read:blog-article','read-collection:blog-article'])]
     #[ORM\Column]
     private array $keywords = [];
 
@@ -308,6 +308,39 @@ class BlogArticle
         if ($this->getCreationDate() == null) {
             $this->setCreationDate(new \DateTimeImmutable());
         }
+    }
+    //Part 2: Algorithmic Challenge//
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function extractTopKeywords(): void
+    {
+        $banned = ['the', 'is', 'in', 'and', 'to', 'a'];
+        $text = $this->content;
+
+        // Normalize text: lower case and remove punctuation
+        $text = strtolower($text);
+        $text = preg_replace('/[^\w\s]/', '', $text);
+
+        // Split text into words
+        $words = preg_split('/\s+/', $text);
+        $wordCounts = [];
+
+        // Count the occurrences of each word
+        foreach ($words as $word) {
+            if (!in_array($word, $banned) && !empty($word)) {
+                if (!isset($wordCounts[$word])) {
+                    $wordCounts[$word] = 0;
+                }
+                $wordCounts[$word]++;
+            }
+        }
+
+        // Sort the words by frequency
+        arsort($wordCounts);
+
+        // Get the top 3 words
+        $topWords = array_slice(array_keys($wordCounts), 0, 3);
+        $this->setKeywords($topWords);
     }
 
 }
