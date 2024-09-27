@@ -12,7 +12,7 @@ class UserControllerTest extends WebTestCase
 
         // Prepare the data to send in JSON format
         $data = [
-            'email' => 'test2@example.com',
+            'email' => 'test6@example.com',
             'fullName' => 'Test User',
             'password' => 'password123',
         ];
@@ -33,7 +33,7 @@ class UserControllerTest extends WebTestCase
         // Assert the response status and content
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            'email' => 'test2@example.com',
+            'email' => 'test6@example.com'
         ]);
     }
 }
