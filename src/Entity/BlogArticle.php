@@ -3,6 +3,10 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\BlogArticleRepository;
 use App\State\Processors\BlogArticle\CreateBlogArticleProcessor;
@@ -21,6 +25,15 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
     name: 'BlogArticleCreating',
     uriTemplate: 'blog_article_create',
 )]
+
+#[Get]
+#[GetCollection]
+#[Patch(
+    denormalizationContext: ['groups'=> ['update:blog-article']],
+
+)]
+#[Delete]
+
 class BlogArticle
 {
     #[ORM\Id]
@@ -32,26 +45,26 @@ class BlogArticle
     #[ORM\JoinColumn(nullable: false)]
     private ?User $authorId = null;
 
-    #[Groups(['write:blog-article'])]
+    #[Groups(['write:blog-article','update:blog-article'])]
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
-    #[Groups(['write:blog-article'])]
+    #[Groups(['write:blog-article','update:blog-article'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $publicationDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $creationDate = null;
 
-    #[Groups(['write:blog-article'])]
+    #[Groups(['write:blog-article','update:blog-article'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[Groups(['write:blog-article'])]
+    #[Groups(['write:blog-article','update:blog-article'])]
     #[ORM\Column]
     private array $keywords = [];
 
-    #[Groups(['write:blog-article'])]
+    #[Groups(['write:blog-article','update:blog-article'])]
     #[Assert\Choice(["draft", "published", "deleted"])]
     #[ORM\Column(length: 100)]
     private ?string $status = null;
@@ -175,6 +188,8 @@ class BlogArticle
     }
 
     #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+
     public function slugify()
     {
         // Replace non letter or digits by -
@@ -194,9 +209,8 @@ class BlogArticle
 
         // Lowercase
         $slug = strtolower($slug);
-        if (empty($this->slug)) {
-            $this->setSlug($slug);
-        }
+
+        $this->setSlug($slug);
     }
     #[ORM\PrePersist]
     public function updateDate()
