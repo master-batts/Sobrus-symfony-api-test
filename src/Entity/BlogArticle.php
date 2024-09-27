@@ -15,8 +15,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
 #[ORM\Entity(repositoryClass: BlogArticleRepository::class)]
 #[ApiResource()]
+#[Vich\Uploadable]
 #[HasLifecycleCallbacks]
 #[Post(
     processor: CreateBlogArticleProcessor::class,
@@ -24,6 +28,7 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
     normalizationContext: ['groups'=> ['write:blog-article']],
     name: 'BlogArticleCreating',
     uriTemplate: 'blog_article_create',
+    inputFormats: ['multipart' => ['multipart/form-data']]
 )]
 
 #[Get]
@@ -71,11 +76,21 @@ class BlogArticle
     #[ORM\Column(length: 100)]
     private ?string $status = null;
 
+    #[Groups(['write:blog-article'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[Groups(['write:blog-article'])]
+    #[Vich\UploadableField(mapping: 'blogArticles', fileNameProperty: 'coverPictureRef', size: 'coverPictureRefSize')]
+    private ?File $coverPictureRefFile = null;
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverPictureRef = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $coverPictureRefSize = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -177,6 +192,27 @@ class BlogArticle
         return $this;
     }
 
+    public function setCoverPictureRefFile(?File $CoverPictureRefFile = null): void
+    {
+        $this->coverPictureRefFile = $CoverPictureRefFile;
+
+        if (null !== $CoverPictureRefFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getCoverPictureRefFile(): ?File
+    {
+        return $this->coverPictureRefFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
     public function getCoverPictureRef(): ?string
     {
         return $this->coverPictureRef;
@@ -186,6 +222,27 @@ class BlogArticle
     {
         $this->coverPictureRef = $coverPictureRef;
 
+        return $this;
+    }
+    public function getCoverPictureRefSize(): ?int
+    {
+        return $this->coverPictureRefSize;
+    }
+
+    public function setCoverPictureRefSize(?int $coverPictureRefSize): self
+    {
+        $this->coverPictureRefSize = $coverPictureRefSize;
+
+        return $this;
+    }
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 
