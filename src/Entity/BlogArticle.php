@@ -30,9 +30,11 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 #[GetCollection]
 #[Patch(
     denormalizationContext: ['groups'=> ['update:blog-article']],
-
+    security: "object.getAuthorId() == user"
 )]
-#[Delete]
+#[Delete(
+    security: "object.getAuthorId() == user"
+)]
 
 class BlogArticle
 {
