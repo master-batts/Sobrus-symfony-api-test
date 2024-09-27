@@ -19,6 +19,10 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+        # Processors
+    App\State\Processors\User\CreateUserProcessor:
+        bind:
+            $processorInterface: '@api_platform.doctrine.orm.state.persist_processor'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
