@@ -24,6 +24,10 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        filters:
+            softdeleteable:
+                class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                enabled: true
 
 when@test:
     doctrine:
@@ -50,3 +54,9 @@ when@prod:
                     adapter: cache.app
                 doctrine.system_cache_pool:
                     adapter: cache.system
+stof_doctrine_extensions:
+    default_locale: en_US
+    translation_fallback: true
+    orm:
+        default:
+            softdeleteable: true

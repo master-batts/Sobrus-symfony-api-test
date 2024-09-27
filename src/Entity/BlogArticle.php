@@ -17,8 +17,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 #[ORM\Entity(repositoryClass: BlogArticleRepository::class)]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false, hardDelete: true)]
 #[ApiResource()]
 #[Vich\Uploadable]
 #[HasLifecycleCallbacks]
@@ -40,9 +43,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[Delete(
     security: "object.getAuthorId() == user"
 )]
-
 class BlogArticle
 {
+    use SoftDeleteableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
