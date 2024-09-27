@@ -103,6 +103,11 @@ class BlogArticle
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[Assert\File(
+        maxSize: '10240k',
+        extensions: ['jpeg','jpg','png'],
+        extensionsMessage: 'Please upload a valid image',
+    )]
     #[Groups(['write-denormalization:blog-article'])]
     #[Vich\UploadableField(mapping: 'blogArticles', fileNameProperty: 'coverPictureRef', size: 'coverPictureRefSize')]
     private ?File $coverPictureRefFile = null;
