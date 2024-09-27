@@ -35,8 +35,12 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
     inputFormats: ['multipart' => ['multipart/form-data']]
 )]
 
-#[Get]
-#[GetCollection]
+#[Get(
+    normalizationContext: ['groups'=> ['read:blog-article']],
+)]
+#[GetCollection(
+    normalizationContext: ['groups'=> ['read-collection:blog-article']],
+)]
 #[Patch(
     denormalizationContext: ['groups'=> ['update:blog-article']],
     security: "object.getAuthorId() == user"
@@ -58,38 +62,40 @@ class BlogArticle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['write-normalization:blog-article','publish:blog-article'])]
+    #[Groups(['write-normalization:blog-article','publish:blog-article','read:blog-article','read-collection:blog-article'])]
     private ?int $id = null;
 
+    #[Groups(['read:blog-article','read-collection:blog-article'])]
     #[ORM\ManyToOne(inversedBy: 'blogArticles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $authorId = null;
 
-    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','publish:blog-article'])]
+    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','publish:blog-article','read:blog-article','read-collection:blog-article'])]
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
-    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article'])]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','read:blog-article','read-collection:blog-article'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable: true)]
     private ?\DateTimeInterface $publicationDate = null;
 
+    #[Groups(['read:blog-article','read-collection:blog-article'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $creationDate = null;
 
-    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article'])]
+    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','read:blog-article','read-collection:blog-article'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article'])]
+    #[Groups(['write-denormalization:blog-article','write-normalization:blog-article','update:blog-article','read:blog-article','read-collection:blog-article'])]
     #[ORM\Column]
     private array $keywords = [];
 
-    #[Groups(['write-normalization:blog-article','update:blog-article','publish:blog-article'])]
+    #[Groups(['write-normalization:blog-article','update:blog-article','publish:blog-article','read:blog-article','read-collection:blog-article'])]
     #[Assert\Choice(["draft", "published", "deleted"])]
     #[ORM\Column(length: 100)]
     private ?string $status = null;
 
-    #[Groups(['write-normalization:blog-article','write:blog-article'])]
+    #[Groups(['write-normalization:blog-article','write:blog-article','read:blog-article','read-collection:blog-article'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
@@ -97,7 +103,7 @@ class BlogArticle
     #[Vich\UploadableField(mapping: 'blogArticles', fileNameProperty: 'coverPictureRef', size: 'coverPictureRefSize')]
     private ?File $coverPictureRefFile = null;
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['write-normalization:blog-article'])]
+    #[Groups(['write-normalization:blog-article','read:blog-article','read-collection:blog-article'])]
     private ?string $coverPictureRef = null;
 
     #[ORM\Column(nullable: true)]

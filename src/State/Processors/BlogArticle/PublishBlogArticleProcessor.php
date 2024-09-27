@@ -14,6 +14,7 @@ class PublishBlogArticleProcessor implements ProcessorInterface
     }
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
+        $data->setPublicationDate(new \DateTime());
         $data->setStatus('published');
 
         return $this->processorInterface->process($data,$operation,$uriVariables,$context);

@@ -29,6 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    #[Groups(['read:blog-article','read-collection:blog-article'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -39,7 +40,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['write:user'])]
+    #[Groups(['write:user','read:blog-article','read-collection:blog-article'])]
     private ?string $fullName = null;
 
     /**
