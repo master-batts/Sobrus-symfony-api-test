@@ -31,30 +31,34 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
     denormalizationContext: ['groups'=> ['write-denormalization:blog-article']],
     normalizationContext: ['groups'=> ['write-normalization:blog-article']],
     name: 'BlogArticleCreating',
-    uriTemplate: 'blog_article_create',
+    uriTemplate: 'blog-articles',
     inputFormats: ['multipart' => ['multipart/form-data']]
 )]
 
 #[Get(
     normalizationContext: ['groups'=> ['read:blog-article']],
+    uriTemplate: 'blog-articles/{id}',
 )]
 #[GetCollection(
     normalizationContext: ['groups'=> ['read-collection:blog-article']],
+    uriTemplate: 'blog-articles',
 )]
 #[Patch(
     denormalizationContext: ['groups'=> ['update:blog-article']],
-    security: "object.getAuthorId() == user"
+    security: "object.getAuthorId() == user",
+    uriTemplate: 'blog-articles/{id}'
 )]
 #[Patch(
     processor:PublishBlogArticleProcessor::class,
     normalizationContext: ['groups'=> ['publish:blog-article']],
     denormalizationContext: ['groups'=> ['denormalization-publish:blog-article']],
-    uriTemplate: 'blog_article_publish/{id}',
+    uriTemplate: 'blog-article-publish/{id}',
     name: 'BlogArticlePublishing',
     security: "object.getAuthorId() == user"
 )]
 #[Delete(
-    security: "object.getAuthorId() == user"
+    security: "object.getAuthorId() == user",
+    uriTemplate: 'blog-articles/{id}'
 )]
 class BlogArticle
 {

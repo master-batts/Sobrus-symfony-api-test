@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ['groups'=> ['write:user']],
     normalizationContext: ['groups'=> ['write:user']],
     name: 'UserCreating',
-    uriTemplate: 'user_create',
+    uriTemplate: 'user-create',
 )]
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
