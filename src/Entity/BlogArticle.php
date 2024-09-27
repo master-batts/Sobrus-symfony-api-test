@@ -228,17 +228,12 @@ class BlogArticle
         return $this->coverPictureRefFile;
     }
 
-    public function setImageName(?string $imageName): void
-    {
-        $this->imageName = $imageName;
-    }
-
     public function getCoverPictureRef(): ?string
     {
         return $this->coverPictureRef;
     }
 
-    public function setCoverPictureRef(string $coverPictureRef): static
+    public function setCoverPictureRef(?string $coverPictureRef): static
     {
         $this->coverPictureRef = $coverPictureRef;
 
